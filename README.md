@@ -17,6 +17,7 @@ None
 
 ## Tested plateform
 - Ubuntu 22.04
+- Ubuntu 20.04
 - Debian 12
 - Debian 11
 
