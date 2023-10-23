@@ -1,0 +1,9 @@
+---
+- name: "Restart Apache"
+  ansible.builtin.service:
+    name: apache2
+    state: restarted
+
+- name: "Reload UFW"
+  community.general.ufw:
+    state: reloaded

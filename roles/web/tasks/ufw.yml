@@ -1,0 +1,47 @@
+---
+- name: Install UFW Firewall
+  ansible.builtin.apt:
+    name: ufw
+    state: present
+  
+- name: UFW resets existing rules
+  community.general.ufw:
+    state: reset
+  
+- name: UFW firewall allow SSH
+  community.general.ufw:
+    rule: allow
+    port: 22
+  
+- name: UFW firewall allow DNS
+  community.general.ufw:
+    rule: allow
+    port: 53
+       
+- name: UFW firewall allow HTTP on port {{  http_port  }}
+  community.general.ufw:
+    rule: allow
+    port: "{{  http_port  }}"
+    proto: tcp
+  
+- name: UFW firewall allow HTTPS on port {{  https_port  }}
+  community.general.ufw:
+    rule: allow
+    port: "{{  https_port  }}"
+    proto: tcp
+  
+- name: Configure default incoming policy
+  community.general.ufw:
+    policy: reject
+    direction: incoming
+  
+- name: Configure default outgoing policy
+  community.general.ufw:
+    policy: allow
+    direction: outgoing
+  
+- name: Enable UFW
+  community.general.ufw:
+    state: enabled
+  notify: "Reload UFW"
+  

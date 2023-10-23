@@ -1,0 +1,14 @@
+skip_list:
+  - 'experimental'
+  - 'galaxy[no-changelog]'
+  - 'meta-runtime[unsupported-version]'
+  - 'name[casing]'
+  - 'name[play]'
+  - 'name[template]'
+  - 'no-handler'
+
+exclude_paths:
+  - '.cache/'
+  - '.git/'
+  - '.virtualenv'
+  - 'build'

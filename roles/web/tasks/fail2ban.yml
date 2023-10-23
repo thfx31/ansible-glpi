@@ -1,0 +1,16 @@
+---
+- name: Install Fail2ban
+  ansible.builtin.apt:
+    name: fail2ban 
+    state: present
+
+- name: Copy custom config file
+  ansible.builtin.template:
+    src: custom.conf
+    dest: /etc/fail2ban/jail.d/custom.conf
+    mode: '0644'
+
+- name: Start fail2ban service
+  service:
+    name: fail2ban
+    state: started

@@ -1,0 +1,36 @@
+---
+# Extra packages
+extra_packages:
+- php-curl
+- php-gd
+- php-mbstring
+- php-intl
+- php-xml
+- php-ldap
+- php-zip
+- php-bz2
+- php-ldap
+- python3-cryptography
+
+# Apache2 vars
+http_host: glpi.deploy
+http_conf: 001-glpi.conf
+http_port: 80
+https_port: 443
+
+# SSL vars
+ssl_csr_directory: /etc/ssl/csr
+ssl_csr_email: "tf.test@tuta.io"
+ssl_crt_directory: /etc/ssl/certs
+ssl_privkey_directory: /etc/ssl/private
+
+# Database vars
+glpi_db_host: "localhost"
+glpi_db_port: "3306"
+glpi_db_root_password: "TfRUPvaPtnEK"
+glpi_db_name: "db_glpi"
+glpi_db_user: "admin"
+glpi_db_password: "pP9gbTS5WXbU"
+
+# GLPI vars
+glpi_install_path: /var/www/glpi

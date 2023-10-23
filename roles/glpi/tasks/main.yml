@@ -1,0 +1,43 @@
+---
+- name: Check if GLPI directory exists
+  ansible.builtin.stat:
+    path: "{{  glpi_install_path  }}"
+  register: dir_stat
+
+- name: Check if install.php exists
+  ansible.builtin.stat:
+    path: "{{  glpi_install_path  }}/install/install.php"
+  register: install_stat
+
+- name: Download GLPI archive
+  ansible.builtin.get_url:
+    url: https://github.com/glpi-project/glpi/releases/download/10.0.10/glpi-10.0.10.tgz
+    dest: /tmp
+  when: not install_stat.stat.exists
+
+- name: Create install directory and unarchive GLPI archive
+  ansible.builtin.unarchive:
+    src: /tmp/glpi-10.0.10.tgz
+    dest: /var/www/
+    owner: www-data
+    group: www-data
+    mode: '0755'
+    remote_src: yes
+  when: not dir_stat.stat.exists
+
+- name: Install GLPI
+  ansible.builtin.command: 
+    "php bin/console -n db:install -H {{  glpi_db_host  }} -P {{  glpi_db_port  }} -d {{  glpi_db_name  }} -u {{  glpi_db_user  }} -p {{  glpi_db_password  }} -L fr_FR --reconfigure --force"
+  args:
+    chdir: "{{  glpi_install_path  }}"
+  when: not dir_stat.stat.exists
+
+- name: Clean install.php file
+  ansible.builtin.file:
+    path: "{{  glpi_install_path  }}/install/install.php"
+    state: absent
+
+- name: Clean archive file
+  ansible.builtin.file:
+    path: /tmp/glpi-10.0.10.tgz 
+    state: absent  

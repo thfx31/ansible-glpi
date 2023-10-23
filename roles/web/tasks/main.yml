@@ -1,0 +1,39 @@
+---
+- name: Install Apache and PHP
+  ansible.builtin.apt:
+    name: ['apache2', 'php', 'php-mysql']
+    state: present
+    update_cache: yes
+
+- name: Install extra packages
+  ansible.builtin.apt:
+    name: "{{ extra_packages }}"
+    state: present
+
+- name: Setup virtualhost
+  ansible.builtin.template:
+    src: templates/glpi-template.conf
+    dest: "/etc/apache2/sites-available/{{ http_conf }}"
+
+- name: Setup Apache SSL
+  ansible.builtin.import_tasks: ssl.yml
+
+- name: Activate Apache2 rewrite module
+  community.general.apache2_module:
+    name: rewrite
+    state: present
+
+- name: Activate Apache2 ssl module
+  community.general.apache2_module:
+    name: ssl
+    state: present
+
+- name: Enable new site
+  ansible.builtin.command: a2ensite {{  http_conf  }}
+  notify: "Restart Apache"
+
+- name: Install and configure UFW
+  ansible.builtin.import_tasks: ufw.yml
+
+- name: Install and configure Fail2ban
+  ansible.builtin.import_tasks: fail2ban.yml

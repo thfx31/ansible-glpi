@@ -1,0 +1,26 @@
+---
+- name: Create CSR directory
+  ansible.builtin.file:
+    path: "{{ ssl_csr_directory }}"
+    state: directory
+    mode: '0755'
+
+- name: Generate an OpenSSL private key with the default values (4096 bits, RSA)
+  community.crypto.openssl_privatekey:
+    path: "{{ ssl_privkey_directory }}/glpi.pem"
+
+- name: Generate an OpenSSL Certificate Signing Request
+  community.crypto.openssl_csr:
+    path: "{{ ssl_csr_directory }}/glpi.csr"
+    privatekey_path: "{{ ssl_privkey_directory }}/glpi.pem"
+    common_name: "www.{{ http_host }}.com"
+    country_name: FR
+    organization_name: AIS
+    email_address: "{{ ssl_csr_email }}"
+
+- name: Generate a Self Signed OpenSSL certificate
+  community.crypto.x509_certificate:
+    path: "{{ ssl_crt_directory }}/glpi.crt"
+    privatekey_path: "{{ ssl_privkey_directory }}/glpi.pem"
+    csr_path: "{{ ssl_csr_directory }}/glpi.csr"
+    provider: selfsigned

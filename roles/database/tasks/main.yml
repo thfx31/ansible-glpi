@@ -1,0 +1,66 @@
+---
+- name: Install MariaDB Server
+  ansible.builtin.apt:
+    name: 
+      - mariadb-server
+      - python3-mysqldb
+    state: present
+    update_cache: yes  
+
+- name: Ensure mariadb service is start
+  ansible.builtin.service:
+    name: mysql
+    state: started
+    enabled: yes
+
+- name: Removes all anonymous user accounts
+  ansible.builtin.mysql_user:
+    name: ''
+    host_all: true
+    state: absent
+
+- name: Remove test database
+  ansible.builtin.mysql_db:
+    name: "test"
+    state: "absent"
+  
+- name: Create MariaDB client config
+  ansible.builtin.copy:
+    dest: "/root/.my.cnf"
+    content: |
+      [client]
+      user=root
+      password={{ glpi_db_root_password }}
+    mode: 0400  
+
+- name: Upload MariaDB table config
+  ansible.builtin.template:
+    src: "table.sql.j2"
+    dest: "/tmp/table.sql"
+
+- name: Add MariaDB table to database
+  community.mysql.mysql_db:
+    name: "{{ glpi_db_name }}"
+    state: present
+    login_user: root
+    login_password: '{{ glpi_db_root_password }}'
+    state: import 
+    target: /tmp/table.sql
+    login_unix_socket: /run/mysqld/mysqld.sock
+
+- name: Clean temp table.sql file
+  ansible.builtin.file:
+    path: /tmp/table.sql
+    state: absent
+
+- name: "Create {{ glpi_db_user }} with all {{ glpi_db_name }} privileges"
+  community.mysql.mysql_user:
+    name: "{{ glpi_db_user }}"
+    password: "{{ glpi_db_password }}"
+    priv: "{{ glpi_db_name }}.*:ALL"
+    host: localhost
+    state: present
+    login_user: root
+    login_password: '{{ glpi_db_root_password }}'
+    login_unix_socket: /var/run/mysqld/mysqld.sock
+  notify: "Restart MariaDB Serveur"
