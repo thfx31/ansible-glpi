@@ -72,3 +72,5 @@ Here is a simple example playbook to use this role:
     - database
     - glpi
 ```
+## Licence
+GPL V3.0
